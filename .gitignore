@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+.env.local
+*.log
+__pycache__/
+*.pyc
+
+# The report and evidence are submitted as a PDF, not committed publicly.
+*.docx
+*.pdf
+evidence/
+CODEX_PROMPT.txt

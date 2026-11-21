@@ -1,0 +1,16 @@
+services:
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "127.0.0.1:27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  jaeger:
+    image: jaegertracing/jaeger:2.5.0
+    ports:
+      - "127.0.0.1:16686:16686" # Jaeger web UI
+      - "127.0.0.1:4318:4318"   # OTLP/HTTP trace receiver
+      - "127.0.0.1:4317:4317"   # OTLP/gRPC (optional)

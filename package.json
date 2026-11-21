@@ -1,0 +1,29 @@
+{
+  "name": "observability-a9",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A9 OpenTelemetry example: Express + MongoDB + Jaeger",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "start": "node --require ./tracing.js index.js",
+    "start:console": "node --env-file=.env.console --require ./tracing.js index.js",
+    "start:jaeger": "node --env-file=.env.jaeger --require ./tracing.js index.js",
+    "traffic": "node scripts/generate-traffic.js",
+    "check": "node --check index.js && node --check tracing.js && node --check scripts/generate-traffic.js"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "1.10.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.301.2",
+    "@opentelemetry/instrumentation-express": "0.73.0",
+    "@opentelemetry/instrumentation-http": "0.301.2",
+    "@opentelemetry/instrumentation-mongodb": "0.78.0",
+    "@opentelemetry/sdk-metrics": "3.1.1",
+    "@opentelemetry/sdk-node": "0.301.2",
+    "@opentelemetry/sdk-trace": "3.1.1",
+    "express": "^4.21.2",
+    "mongodb": "^6.17.0"
+  }
+}
