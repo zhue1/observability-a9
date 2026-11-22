@@ -13,4 +13,3 @@ services:
     ports:
       - "127.0.0.1:16686:16686" # Jaeger web UI
       - "127.0.0.1:4318:4318"   # OTLP/HTTP trace receiver
-      - "127.0.0.1:4317:4317"   # OTLP/gRPC (optional)

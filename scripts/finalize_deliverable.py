@@ -6,7 +6,9 @@ For the final document, supply a public URL and actual locally captured screensh
 """
 import argparse
 import re
+from io import BytesIO
 from pathlib import Path
+from zipfile import ZipFile, ZIP_DEFLATED
 
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
@@ -72,6 +74,8 @@ def main():
     parser.add_argument('--screenshot', action='append', default=[])
     parser.add_argument('--output', default='Observability Submission.docx')
     args = parser.parse_args()
+    if Path(args.output).resolve() == Path(args.template).resolve():
+        raise ValueError('The output must differ from the original template.')
 
     text = Path(args.analysis).read_text(encoding='utf-8').strip()
     words = re.findall(r"\b[\w'-]+\b", text)
@@ -131,7 +135,22 @@ def main():
     # placeholder highlighting; paragraph.clear() only removes its text runs.
     for highlight in list(doc.element.iter(qn('w:highlight'))):
         highlight.getparent().remove(highlight)
-    doc.save(args.output)
+    # python-docx can reserialize styles, numbering, settings, and font
+    # relationships even when they were not edited. Retain those original
+    # package parts byte-for-byte; only the filled body, its relationships,
+    # content types, metadata, and newly embedded media need to change.
+    edited = BytesIO()
+    doc.save(edited)
+    editable_parts = {'word/document.xml', 'word/_rels/document.xml.rels',
+                      '[Content_Types].xml', 'docProps/core.xml'}
+    with ZipFile(args.template) as original, ZipFile(edited) as changed, \
+            ZipFile(args.output, 'w', ZIP_DEFLATED) as output:
+        for part in original.namelist():
+            source = changed if part in editable_parts else original
+            output.writestr(part, source.read(part))
+        for part in changed.namelist():
+            if part not in original.namelist():
+                output.writestr(part, changed.read(part))
     print(f'Created {args.output} ({len(words)} words of analysis, {len(args.screenshot)} screenshots).')
 
 if __name__ == '__main__':

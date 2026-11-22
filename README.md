@@ -4,7 +4,9 @@ This is an instrumented `todo-service` built for the observability assignment. I
 
 ## Verification status — November 21, 2026
 
-Dependency installation, JavaScript syntax checks, and OpenTelemetry tracer/meter initialization passed. The installed dependency tree reports zero npm audit vulnerabilities. End-to-end verification is pending: Docker Desktop is not installed on the verification machine, MongoDB is unavailable, and application startup fails with `ECONNREFUSED` on port 27017. No successful request traces, Jaeger screenshots, or submission-ready PDF have been produced. The original Word template remains unchanged.
+Dependency installation, JavaScript syntax checks, and OpenTelemetry tracer/meter initialization passed; npm audit reported zero vulnerabilities. MongoDB passed its Compose health check and ping, and Jaeger returned HTTP 200. A console-mode GET /todo returned three records and exported real HTTP, Express, and MongoDB spans, JSON logs, and request metrics. After switching to OTLP HTTP, all nine HTTP traffic checks passed and Jaeger returned nine todo-service traces. The captured GET /todo trace had eight spans, a 7.916 ms total duration, and a 5.810 ms MongoDB find span beneath todo.list and the Express handler. The intentional HTTP 500 trace contained three error-marked spans and exception events. Request metrics totaled nine requests, and JSON log trace IDs matched Jaeger.
+
+Two screenshots were captured from the actual local Jaeger UI. The private two-page PDF was generated from the original Word template, visually inspected on every page, and checked for its complete clickable public repository URL. The original template and its styles, numbering, settings, and font parts were preserved. Evidence, Word files, and PDFs are excluded from this public source repository. At the user's request, the temporary containers/images and Docker Desktop were removed after verification; reinstall Docker Desktop to reproduce the runtime checks.
 
 ## Requirements
 
@@ -30,7 +32,7 @@ If you want to use the exact commands in the assignment instead of Docker Compos
 
 ```bash
 docker run -d --name a9-mongo -p 127.0.0.1:27017:27017 mongo:7.0
-docker run -d --name jaeger -p 127.0.0.1:16686:16686 -p 127.0.0.1:4318:4318 -p 127.0.0.1:4317:4317 jaegertracing/jaeger:2.5.0
+docker run -d --name jaeger -p 127.0.0.1:16686:16686 -p 127.0.0.1:4318:4318 jaegertracing/jaeger:2.5.0
 ```
 
 Use either Docker Compose **or** those `docker run` commands, not both simultaneously.
